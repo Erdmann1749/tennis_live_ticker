@@ -56,33 +56,6 @@ db_formation = Formation(db)
 db_server = Server(db, db_score)
 db_blog = Blog(db)
 
-# Initialize session state if not already initialized
-if 'your_team' not in st.session_state:
-    st.session_state.your_team = ["Player 1", "Player 2", "Player 3", "Player 4", "Player 5", "Player 6"]
-if 'opposing_team' not in st.session_state:
-    st.session_state.opposing_team = ["Opponent 1", "Opponent 2", "Opponent 3", "Opponent 4", "Opponent 5",
-                                      "Opponent 6"]
-if 'your_team_name' not in st.session_state:
-    st.session_state.your_team_name = "Your Team"
-if 'opposing_team_name' not in st.session_state:
-    st.session_state.opposing_team_name = "Opposing Team"
-if 'singles_scores' not in st.session_state:
-    st.session_state.singles_scores = [[0, 0] for _ in range(6)]
-if 'doubles_scores' not in st.session_state:
-    st.session_state.doubles_scores = [[0, 0] for _ in range(3)]
-if 'singles_serve' not in st.session_state:
-    st.session_state.singles_serve = [None for _ in range(6)]
-if 'doubles_serve' not in st.session_state:
-    st.session_state.doubles_serve = [None for _ in range(3)]
-if 'singles_scores' not in st.session_state:
-    st.session_state.singles_scores = [[0, 0] for _ in range(6)]  # Initial scores
-if 'singles_sets' not in st.session_state:
-    st.session_state.singles_sets = [[[0, 0], [0, 0], [0, 0]] for _ in range(6)]  # Sets are [game1, game2, tiebreak]
-if 'doubles_scores' not in st.session_state:
-    st.session_state.doubles_scores = [[0, 0] for _ in range(3)]
-if 'doubles_sets' not in st.session_state:
-    st.session_state.doubles_sets = [[[0, 0], [0, 0], [0, 0]] for _ in range(3)]
-
 
 # Function to print winner statement
 def print_set_winner(match_index, player, double=False):
@@ -105,7 +78,7 @@ def update_names():
 
     # Your Team Input Fields
     with col1:
-        team_name = st.text_input("", db_formation.get_db_team_name(),key="your_team_name")
+        team_name = st.text_input("", db_formation.get_db_team_name(), key="your_team_name")
         st.markdown("---")  # Separation line
         st.markdown("## Einzel Spieler")
         your_team = {}
@@ -167,12 +140,9 @@ def prepare_table_data():
     double_scores = db_score.get_all_double_scores()
     your_team_name = db_formation.get_db_team_name()
     opponent_team_name = db_formation.get_db_opposing_team_name()
-    
-    your_team_x = db_formation.get_db_single_team()
-    your_team_x = [pl.split(",")[1].split("(")[0].strip() for pl in your_team_x]
-    opponent_team_x = db_formation.get_db_single_opponent()
-    opponent_team_x = [pl.split(",")[1].split("(")[0].strip() for pl in opponent_team_x]
 
+    your_team_x = db_formation.get_db_single_team()
+    opponent_team_x = db_formation.get_db_single_opponent()
 
     your_team, opponent_team = db_server.add_server_symbol_to_formation(your_team_x, opponent_team_x)
 
@@ -202,7 +172,7 @@ def prepare_table_data():
 
 # Main page: Overview and summary
 def main_page():
-    st.title(f"{st.session_state.your_team_name} vs {st.session_state.opposing_team_name} - Live Ticker")
+    st.title(f"{db.get_team_name()} vs {db.get_team_name(opponents=True)} - Live Ticker")
 
     # Display overview of scores as tables
     st.header("Einzel")
@@ -217,16 +187,10 @@ def main_page():
     blog = db_blog.get_blog_entries()
     for timestamp, message in blog:
         t = timestamp.split(' ')[1].split(':')[0:2]
-        m_time = f"{int(t[0])+2}:{t[1]}"
+        m_time = f"{int(t[0]) + 2}:{t[1]}"
         st.markdown(f"{m_time}: {message}")
 
     time.sleep(2)
-    st.rerun()
-
-
-# Function to update the score and manage the game and set logic
-def update_score(match_index, player, add_game=False):
-    db_score._update_score(match_index, player, add_game)
     st.rerun()
 
 
