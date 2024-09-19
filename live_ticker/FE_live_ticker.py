@@ -167,9 +167,12 @@ def prepare_table_data():
     double_scores = db_score.get_all_double_scores()
     your_team_name = db_formation.get_db_team_name()
     opponent_team_name = db_formation.get_db_opposing_team_name()
-
+    
     your_team_x = db_formation.get_db_single_team()
+    your_team_x = [pl.split(",")[1].split("(")[0].strip() for pl in your_team_x]
     opponent_team_x = db_formation.get_db_single_opponent()
+    opponent_team_x = [pl.split(",")[1].split("(")[0].strip() for pl in opponent_team_x]
+
 
     your_team, opponent_team = db_server.add_server_symbol_to_formation(your_team_x, opponent_team_x)
 
