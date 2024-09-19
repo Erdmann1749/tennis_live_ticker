@@ -148,96 +148,6 @@ class Score:
 
         return current_set, is_third_set, int(player_score), int(opponent_score), player_points, opponent_points
 
-    def _update_score(self, match_index, opponent_scored=False, add_game=False):
-
-        # get current scores
-        scores, set1, set2, set3 = self.get_scores_specific_match(match_index)
-        player_points, opponent_points = scores
-        sets = [set1, set2, set3]
-
-        # get current set
-        current_set, is_thrid_set = self._current_set(sets)
-        player_score, opponent_score = sets[current_set]
-
-        # if third set, add game and add point are the same
-        if current_set == 3:  # If it's the third set (tiebreak)
-            player_points, opponent_points = tennis_point_logic(
-                player_points, opponent_points, third_set=True, opponent_scored=opponent_scored)
-
-            self._db.set_scores_add_game(
-                match_number=match_index, score_set=3, score_player=player_score, score_opponent=opponent_score,
-                opponent=opponent_scored
-            )
-            if player_points == "Win":
-                print("Player won Match")
-            elif opponent_points == "Win":
-                print("Opponent won Match")
-
-        elif player_score == opponent_score == 6:
-            if add_game:
-                self._db.set_scores_add_game(
-                    match_number=match_index, score_set=current_set, score_player=player_score,
-                    score_opponent=opponent_score, opponent=opponent_scored)
-                print("Win Set")
-            else:
-                player_points, opponent_points = tennis_point_logic(
-                    player_points, opponent_points, tie_break=True, opponent_scored=opponent_scored)
-
-                if player_points == "Win" or opponent_points == "Win":
-                    self._db.set_scores_add_game(match_number=match_index, score_set=current_set,
-                                                 score_player=player_score, score_opponent=opponent_points,
-                                                 opponent=opponent_scored)
-
-                    self._db.set_scores_add_point(match_number=match_index, score_set=0,
-                                                  score_player=0, score_opponent=0)  # reset points
-                    print("Win set")
-                else:
-                    self._db.set_scores_add_point(
-                        match_number=match_index, score_set=0, score_player=player_points,
-                        score_opponent=opponent_points
-                    )
-        elif add_game:
-
-            self._db.set_scores_add_game(match_number=match_index, score_set=current_set,
-                                         score_player=player_score, score_opponent=opponent_points,
-                                         opponent=opponent_scored)
-            self._db.set_scores_add_point(match_number=match_index, score_set=0,
-                                          score_player=0, score_opponent=0)
-            # if double:
-            #    st.session_state.doubles_sets[match_index][current_set][player] += 1
-            #    if (st.session_state.doubles_sets[match_index][current_set][player] == 6 and
-            #            (st.session_state.doubles_sets[match_index][current_set][player] -
-            #             st.session_state.doubles_sets[match_index][current_set][opponent_scored]) >= 2
-            #           or st.session_state.doubles_sets[match_index][current_set][player] == 7):
-            #        print_set_winner(match_index, player, double)
-            # else:
-            #    st.session_state.singles_sets[match_index][current_set][player] += 1
-            #    if st.session_state.singles_sets[match_index][current_set][player] == 6 and \
-            #            (st.session_state.singles_sets[match_index][current_set][player] -
-            #             st.session_state.singles_sets[match_index][current_set][opponent_scored]) >= 2 or \
-            #            st.session_state.singles_sets[match_index][current_set][player] == 7:
-            #        print_set_winner(match_index, player, double)
-        else:
-            print(f"Player Score: {player_points}, Opponent Score: {opponent_points}")
-            player_points, opponent_points = tennis_point_logic(player_points, opponent_points,
-                                                                opponent_scored=opponent_scored)
-            print(f"Player Score: {player_points}, Opponent Score: {opponent_points}")
-
-            if player_points == "Win" or opponent_points == "Win":
-                self._db.set_scores_add_game(match_number=match_index, score_set=current_set,
-                                             score_player=player_score, score_opponent=opponent_points,
-                                             opponent=opponent_scored)
-                self._db.set_scores_add_point(match_number=match_index, score_set=0,
-                                              score_player=0, score_opponent=0)
-
-            if player_points == "Duece" or opponent_points == "Duece":
-                self._db.set_scores_add_point(match_number=match_index, score_set=0,
-                                              score_player=40, score_opponent=40)
-            else:
-                print(f"Player Score: {player_points}, Opponent Score: {opponent_points}")
-                self._db.set_scores_add_point(match_number=match_index, score_set=0,
-                                              score_player=player_points, score_opponent=opponent_points)
-
 
 class Formation:
     def __init__(self, db: DB):
@@ -256,10 +166,16 @@ class Formation:
         return self._db_opposing_team_name
 
     def get_db_single_team(self):
-        return self._db_single_team
+        return [
+            player.split(",")[1].split("(")[0].strip() if "," in player else player
+            for player in self._db_single_team
+        ]
 
     def get_db_single_opponent(self):
-        return self._db_single_opponent
+        return [
+            player.split(",")[1].split("(")[0].strip() if "," in player else player
+            for player in self._db_single_opponent
+        ]
 
     def get_db_double_team(self):
         return self._db_double_team
@@ -458,7 +374,6 @@ class Blog:
             return 1
         return -1
 
-
     def _check_for_set_win(self, match_specifics, scores):
         """Check if the player has won the set."""
         current_set, is_third_set, _, _, player_points, opponent_points = match_specifics
@@ -474,7 +389,7 @@ class Blog:
         if nb_finished_sets == 0:
             return -1
         if not is_third_set:
-            if scores[nb_finished_sets+1][0] != "0" or scores[nb_finished_sets+1][1] != "0":
+            if scores[nb_finished_sets + 1][0] != "0" or scores[nb_finished_sets + 1][1] != "0":
                 return -1
 
         if nb_finished_sets == 1:
