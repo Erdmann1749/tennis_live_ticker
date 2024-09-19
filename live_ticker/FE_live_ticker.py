@@ -105,7 +105,7 @@ def update_names():
 
     # Your Team Input Fields
     with col1:
-        team_name = st.text_input("", db_formation.get_db_team_name())
+        team_name = st.text_input("", db_formation.get_db_team_name(),key="your_team_name")
         st.markdown("---")  # Separation line
         st.markdown("## Einzel Spieler")
         your_team = {}
@@ -134,7 +134,7 @@ def update_names():
 
     # Opposing Team Input Fields
     with col2:
-        opposing_team_name = st.text_input("", db_formation.get_db_opposing_team_name())
+        opposing_team_name = st.text_input("", db_formation.get_db_opposing_team_name(), key="opposing_team_name")
         st.markdown("---")  # Separation line
         st.markdown("## Singles Players")
         opposing_team = {}
