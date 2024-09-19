@@ -174,6 +174,37 @@ def prepare_table_data():
 def main_page():
     st.title(f"{db.get_team_name()} vs {db.get_team_name(opponents=True)} - Live Ticker")
 
+    # Add custom CSS for a scrollable container
+    st.markdown("""
+        <style>
+        .scrollable-container {
+            max-height: 100px;  /* Adjust the height as needed */
+            overflow-y: auto;
+            padding: 1px;
+            border: 10px solid ##333333;
+            background-color: #333333;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+    # Placeholder for live blog feed
+    st.markdown('<div class="scrollable-container">', unsafe_allow_html=True)
+
+    blog = db_blog.get_blog_entries()
+    blog_feed_data = []
+    for timestamp, message in blog:
+        t = timestamp.split(' ')[1].split(':')[0:2]
+        m_time = f"{int(t[0]) + 2}:{t[1]}"
+        blog_feed_data.append(f"{m_time}: {message}")
+
+    # Display live updates inside the scrollable container
+    feed_html = "<div class='scrollable-container'>"
+    for update in blog_feed_data:
+        feed_html += f"<p>{update}</p>"
+    feed_html += "</div>"
+
+    st.markdown(feed_html, unsafe_allow_html=True)
+
     # Display overview of scores as tables
     st.header("Einzel")
     singles_df, doubles_df = prepare_table_data()
@@ -184,11 +215,7 @@ def main_page():
 
     st.header("Live Blog")
 
-    blog = db_blog.get_blog_entries()
-    for timestamp, message in blog:
-        t = timestamp.split(' ')[1].split(':')[0:2]
-        m_time = f"{int(t[0]) + 2}:{t[1]}"
-        st.markdown(f"{m_time}: {message}")
+
 
     time.sleep(2)
     st.rerun()
