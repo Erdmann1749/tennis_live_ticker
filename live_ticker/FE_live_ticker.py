@@ -178,17 +178,17 @@ def main_page():
     st.markdown("""
         <style>
         .scrollable-container {
-            max-height: 100px;  /* Adjust the height as needed */
+            max-height: 120px;  /* Adjust the height as needed */
             overflow-y: auto;
             padding: 1px;
-            border: 10px solid ##333333;
-            background-color: #333333;
+            border: 10px solid #ccc;
+            background-color: #ccc;
+            text-color: black;  /* Text color to white for contrast */
         }
         </style>
         """, unsafe_allow_html=True)
 
     # Placeholder for live blog feed
-    st.markdown('<div class="scrollable-container">', unsafe_allow_html=True)
 
     blog = db_blog.get_blog_entries()
     blog_feed_data = []
@@ -213,11 +213,7 @@ def main_page():
     st.header("Doppel")
     st.dataframe(doubles_df, hide_index=True)
 
-    st.header("Live Blog")
-
-
-
-    time.sleep(2)
+    time.sleep(5)
     st.rerun()
 
 
@@ -358,4 +354,7 @@ else:
         display_match(match_num + 6)
     elif page == "Aufstellung":
         settings_page()
+
+
+# Main navigation
 
