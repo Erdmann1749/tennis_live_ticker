@@ -165,17 +165,21 @@ class Formation:
     def get_db_opposing_team_name(self):
         return self._db_opposing_team_name
 
-    def get_db_single_team(self):
-        return [
-            player.split(",")[1].split("(")[0].strip() if "," in player else player
-            for player in self._db_single_team
-        ]
+    def get_db_single_team(self, short=True):
+        if short:
+            return [
+                player.split(",")[1].split("(")[0].strip() if "," in player else player
+                for player in self._db_single_team
+            ]
+        return self._db_single_team
 
-    def get_db_single_opponent(self):
-        return [
-            player.split(",")[1].split("(")[0].strip() if "," in player else player
-            for player in self._db_single_opponent
-        ]
+    def get_db_single_opponent(self, short=True):
+        if short:
+            return [
+                player.split(",")[1].split("(")[0].strip() if "," in player else player
+                for player in self._db_single_opponent
+            ]
+        return self._db_single_opponent
 
     def get_db_double_team(self):
         return self._db_double_team
