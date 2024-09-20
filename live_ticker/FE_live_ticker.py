@@ -243,6 +243,7 @@ def display_match(match_index):
     player_ws, opponent_ws = db_server.add_server_symbol_to_player(match_index, player, opponent)
     df = pd.DataFrame(data, index=[player_ws, opponent_ws])
 
+    match_specifics = db_score.get_match_specifics(match_index)
     # Display the dataframe as a table
     st.table(df)
 
@@ -253,18 +254,22 @@ def display_match(match_index):
         st.write(f"{player}")
         if st.button("Add Point", key=f"add_point_p1_{match_index}"):
             db_score.add_team_point(match_index)
+            db_blog.add_blog_auto_entry(match_specifics, scores, match_index, player)
             st.rerun()
         if st.button("Add Game", key=f"add_game_p1_{match_index}"):
             db_score.add_team_game(match_index)
+            db_blog.add_blog_auto_entry(match_specifics, scores, match_index, player)
             st.rerun()
 
     with col2:
         st.write(f"{opponent}")
         if st.button("Add Point", key=f"add_point_p2_{match_index}"):
             db_score.add_opponent_point(match_index)
+            db_blog.add_blog_auto_entry(match_specifics, scores, match_index, player)
             st.rerun()
         if st.button("Add Game", key=f"add_game_p2_{match_index}"):
             db_score.add_opponent_game(match_index)
+            db_blog.add_blog_auto_entry(match_specifics, scores, match_index, player)
             st.rerun()
 
     st.markdown("---")
@@ -307,9 +312,6 @@ def display_match(match_index):
         db_score.reset_scores(match_index)
         st.rerun()
 
-    match_specifics = db_score._match_specifics(match_index)
-    db_blog.add_blog_auto_entry(match_specifics, scores, match_index, player)
-
 
 # Player and team name input page
 def settings_page():
@@ -323,7 +325,6 @@ correct_passcode = "aufstiegWBW"
 # Use session state to track if the user has successfully entered the passcode
 if "passcode_correct" not in st.session_state:
     st.session_state.passcode_correct = False
-st.session_state.passcode_correct = True
 
 # Check if the passcode is correct
 if not st.session_state.passcode_correct:
