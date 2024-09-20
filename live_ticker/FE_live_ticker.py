@@ -83,7 +83,7 @@ def update_names():
         st.markdown("## Einzel Spieler")
         your_team = {}
         for i in range(6):
-            your_team[i] = st.selectbox("", [db_formation.get_db_single_team()[i]] + LIST_OF_PLAYERS,
+            your_team[i] = st.selectbox("", [db_formation.get_db_single_team(short=False)[i]] + LIST_OF_PLAYERS,
                                         key=f"your_team_{i}")
 
         st.markdown("---")  # Separation line
@@ -112,7 +112,7 @@ def update_names():
         st.markdown("## Singles Players")
         opposing_team = {}
         for i in range(6):
-            opposing_team[i] = st.selectbox("", [db_formation.get_db_single_opponent()[i]] + LIST_OF_OPPONENTS,
+            opposing_team[i] = st.selectbox("", [db_formation.get_db_single_opponent(short=Fale)[i]] + LIST_OF_OPPONENTS,
                                             key=f"opposing_team_{i}")
         st.markdown("---")  # Separation line
         if st.button("Update Einzel Aufstellung", key="update_opposing_team"):
