@@ -321,19 +321,41 @@ def settings_page():
     update_names()
 
 
-# Main navigation
-st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to",
-                        ["Aufstellung", "Overview", "Match 1", "Match 2", "Match 3", "Match 4", "Match 5", "Match 6",
-                         "Doubles 1", "Doubles 2", "Doubles 3"])
+# Define the correct passcode
+correct_passcode = "aufstiegWBW"
 
-if page == "Overview":
-    main_page()
-elif page.startswith("Match"):
-    match_num = int(page.split(" ")[1]) - 1
-    display_match(match_num)
-elif page.startswith("Doubles"):
-    match_num = int(page.split(" ")[1]) - 1
-    display_match(match_num + 6)
-elif page == "Aufstellung":
-    settings_page()
+# Use session state to track if the user has successfully entered the passcode
+if "passcode_correct" not in st.session_state:
+    st.session_state.passcode_correct = False
+
+# Check if the passcode is correct
+if not st.session_state.passcode_correct:
+    # Ask for the passcode
+    passcode = st.text_input("Enter passcode:", type="password")
+
+    # Button to submit the passcode
+    if st.button("Submit"):
+        if passcode == correct_passcode:
+            st.session_state.passcode_correct = True
+            st.success("Passcode correct! Access granted.")
+            st.rerun()
+        else:
+            st.error("Incorrect passcode. Try again.")
+else:
+    st.sidebar.title("Navigation")
+    page = st.sidebar.radio("Go to",
+                            ["Aufstellung", "Overview", "Match 1", "Match 2", "Match 3", "Match 4", "Match 5",
+                             "Match 6",
+                             "Doubles 1", "Doubles 2", "Doubles 3"])
+
+    if page == "Overview":
+        main_page()
+    elif page.startswith("Match"):
+        match_num = int(page.split(" ")[1]) - 1
+        display_match(match_num)
+    elif page.startswith("Doubles"):
+        match_num = int(page.split(" ")[1]) - 1
+        display_match(match_num + 6)
+    elif page == "Aufstellung":
+        settings_page()
+
