@@ -385,6 +385,14 @@ class Blog:
 
         if player_points != "0" or opponent_points != "0":
             return -1
+            
+        if scores[2][0] != "0" or scores[2][1] != "0":
+            if int(scores[3][0]) < 6 and int(scores[3][1]) < 6:
+                return -1
+        
+        if scores[3][0] != "0" or scores[3][1] != "0":
+            if int(scores[3][0]) < 10 and int(scores[3][1]) < 10:
+                return -1
         possible_messages = []
         for set_number, (player_score, opponent_score) in enumerate(scores[1:], start=1):
             possible_messages.append(self.is_set_won(player_score, opponent_score, set_number == 3))
