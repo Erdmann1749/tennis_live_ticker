@@ -110,7 +110,7 @@ class Score:
             else:
                 self._db.set_scores(match_index, 0, player_points, opponent_points)
 
-    def add_team_point(self, match_index):
+    def add_team_point(self, match_index,):
         (current_set, is_third_set, player_score, opponent_score, player_points,
          opponent_points) = self._match_specifics(match_index)
         if is_third_set:
@@ -148,6 +148,8 @@ class Score:
 
         return current_set, is_third_set, int(player_score), int(opponent_score), player_points, opponent_points
 
+    def get_match_specifics(self, match_index):
+        return self._match_specifics(match_index)
 
 class Formation:
     def __init__(self, db: DB):
@@ -325,7 +327,6 @@ class Blog:
 
         # Check for set win
         set_win_entry = self._check_for_set_win(match_specifics, scores)
-        print(set_win_entry)
         if set_win_entry > -1:
             entries.append(set_win_entry)
 
@@ -353,8 +354,7 @@ class Blog:
         match_point_entry = self._check_for_match_point(scores)
         if match_point_entry > -1:
             entries.append(match_point_entry)
-            
-        entries = list(set(entries))
+
         # Return the entries
         return [self._message_map[entry].replace("#Spieler", player_name) for entry in entries]
 
@@ -385,11 +385,6 @@ class Blog:
 
         if player_points != "0" or opponent_points != "0":
             return -1
-            
-        if scores[2][0] != "0" or scores[2][1] != "0":
-            if int(scores[3][0]) < 6 and int(scores[3][1]) < 6:
-                return -1
-        
         if scores[3][0] != "0" or scores[3][1] != "0":
             if int(scores[3][0]) < 10 and int(scores[3][1]) < 10:
                 return -1
@@ -404,10 +399,8 @@ class Blog:
         if not is_third_set:
             if scores[nb_finished_sets + 1][0] != "0" or scores[nb_finished_sets + 1][1] != "0":
                 return -1
-
         if nb_finished_sets == 1:
             return 1000 if possible_messages[0] == 0 else 1100
-
         if nb_finished_sets == 2:
             if possible_messages[0] == 0 and possible_messages[1] == 0:
                 return 1002
