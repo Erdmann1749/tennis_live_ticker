@@ -353,7 +353,8 @@ class Blog:
         match_point_entry = self._check_for_match_point(scores)
         if match_point_entry > -1:
             entries.append(match_point_entry)
-
+            
+        entries = list(set(entries))
         # Return the entries
         return [self._message_map[entry].replace("#Spieler", player_name) for entry in entries]
 
