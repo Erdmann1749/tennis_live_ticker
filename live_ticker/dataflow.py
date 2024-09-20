@@ -110,7 +110,7 @@ class DB:
                FROM teams WHERE team_side = ? AND double = ? ORDER BY timestamp DESC""",
             (team_side, val_double)
         )
-        return players if players else ["player1", "player2", "player3", "player4", "player5", "player6"]
+        return players if players else ["Wähle einen Spieler"] * 6
 
     def get_player_single(self, player_num):
         """
